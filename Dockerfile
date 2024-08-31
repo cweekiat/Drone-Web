@@ -1,20 +1,25 @@
-# Use the official Python image.
-FROM python:3.9-slim
+# Use an official NVIDIA CUDA base image with Python
+FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04
 
-# Set the working directory.
+# Install system dependencies and Python
+RUN apt-get update && apt-get install -y \
+    python3-pip \
+    python3-dev \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set up the working directory
 WORKDIR /app
 
-# Copy the requirements file into the container.
-COPY requirements.txt .
+# Copy the application files
+COPY . /app
 
-# Install the required packages.
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application code into the container.
-COPY . .
+# Expose port 8080
+EXPOSE 8080
 
-# Expose the port that the app will run on.
-EXPOSE 5000
-
-# Define the command to run the app.
-CMD ["python", "web.py"]
+# Run the application
+CMD ["python3", "app.py"]
